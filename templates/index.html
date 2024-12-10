@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Expense Tracker</title>
+    <style>
+        #expenseForm {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <h1>Welcome to the Expense Tracker</h1>
+    <button type="button" onclick="showForm()">Add an Expense</button>
+
+    <form action="{{ url_for('clear_expenses_route') }}" method="post" style="display:inline;">
+        <button type="submit" class="btn btn-danger">Clear Expenses</button>
+    </form>
+
+    <form action="{{ url_for('set_budget_route') }}" method="post">
+        Set Your Budget: <input type="number" name="budget" step="0.01"><br>
+        <input type="submit" value="Set Budget">
+    </form>
+
+    <div id="expenseForm">
+        <form action="{{ url_for('add_expense') }}" method="post">
+            <input type="hidden" name="category" id="categoryInput">
+            Select a category:<br>
+            <button type="button" onclick="setCategory('Food')">Food</button>
+            <button type="button" onclick="setCategory('Transportation')">Transportation</button>
+            <button type="button" onclick="setCategory('Utilities')">Utilities</button>
+            <button type="button" onclick="setCategory('Fun')">Fun</button>
+            <button type="button" onclick="setCategory('Health')">Health</button>
+            <button type="button" onclick="setCategory('Shopping')">Shopping</button>
+            <br>Expense Name: <input type="text" name="expenseName"><br>
+            Amount: <input type="number" name="amount" step="0.01"><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <div>
+        <h2>Summary</h2>
+        <p>Total Spent: ${{ summary['total_spent'] }}</p>
+        <p>Remaining Budget: ${{ summary['remaining_budget'] }}</p>
+        <h3>Expenses by Category</h3>
+        <ul>
+            {% for category, amount in summary['amount_by_category'].items() %}
+            <li>{{ category }}: ${{ amount }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        function showForm() {
+            document.getElementById('expenseForm').style.display = 'block';
+        }
+
+        function setCategory(category) {
+            document.getElementById('categoryInput').value = category;
+            // Optional: Provide feedback or automatically show the rest of the form
+            alert("Category selected: " + category);
+            // Show the rest of the form if it's initially hidden
+            showForm();
+        }
+    </script>
+</body>
+</html>
